@@ -1,7 +1,7 @@
 const express = require('express');
 const User = require('../models/signUpUser');
 const path = require('path');
-
+const bcrypt  = require('bcrypt');
 exports.getLoginPage = (req,res,next) => {
     res.sendFile(path.join(__dirname,'../','public','views','login.html'));
 };
@@ -26,12 +26,20 @@ exports.postValidiateLogin = async (req,res,next) =>{
               
           })
             .then((password) => {
-                  if(password === userValidiate.password){
-                       res.send('You Successfully login');
-                  }
-                  else{
-                    res.send('Wrong Password');
-                  }
+                  
+                    bcrypt.compare(userValidiate.password, password , (err , result) => {
+                            if(err){
+                              res.status(500).send(err);
+                            }
+                            if(result == true){
+                              res.status(200).send('You Successfully login');
+                            }
+                            else{
+                              res.send('Wrong Password');
+                            }
+                    })
+                 
+                  
             })
          
            .catch(err => {
